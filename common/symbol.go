@@ -15,7 +15,6 @@ func NewBihaiSymbol() *BihaiSymbol {
 	return bihai.defaultInit()
 }
 
-// 初始化系统默认币种
 func (b *BihaiSymbol) defaultInit() *BihaiSymbol {
 	for _, symbol := range append(CommonUsdt, BihaiUsdt...) {
 		b.BihaiUsdtSymbol = append(b.BihaiUsdtSymbol, strings.ToLower(strings.Replace(symbol, "_", "", -1)))
@@ -32,7 +31,6 @@ func (b *BihaiSymbol) defaultInit() *BihaiSymbol {
 	return b
 }
 
-//检查币对是否存在并转换
 func (b *BihaiSymbol) symbolTransfer(symbol string) string {
 	isExist1, _ := Contain(symbol, b.BihaiUsdtSymbol)
 
