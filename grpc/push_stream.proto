@@ -1,0 +1,21 @@
+syntax="proto3";
+
+//request
+message RpcPushRequest{
+    string event=1;
+    string data=2;
+}
+
+//response
+message RpcPushResponse{
+    int32 code=1;
+    string message=2;
+    string data=3;
+}
+
+//interface
+service RpcPushService{
+    //双向流式rpc
+    rpc ChatBidStream(stream RpcPushRequest)returns(RpcPushResponse){}
+
+}
