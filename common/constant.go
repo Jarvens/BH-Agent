@@ -1,7 +1,7 @@
 // date: 2019-02-27
 package common
 
-//bh.order.base.btc_usdt.depth
+//bh.order.subscribe.base.btc_usdt.depth
 //bh.order.leverage.btc_usdt.depth
 var Order = "bh.order.%s.%s.%s"
 
@@ -30,10 +30,10 @@ const (
 )
 
 const (
-	Subscribe   = "subscribe"
-	UbSubscribe = "un_subscribe"
-	Ping        = "ping"
-	Pong        = "pong"
+	Subscribe    = "subscribe"
+	UnbSubscribe = "un_subscribe"
+	Ping         = "ping"
+	Pong         = "pong"
 )
 
 const (
