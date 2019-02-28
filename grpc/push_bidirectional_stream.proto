@@ -1,5 +1,5 @@
 syntax="proto3";
-
+package grpc;
 //request
 message RpcPushRequest{
     string event=1;
@@ -16,7 +16,7 @@ message RpcPushResponse{
 //interface
 service RpcPushService{
     //双向流式rpc
-    rpc ChatBidStream(stream RpcPushRequest)returns(RpcPushResponse){}
+    rpc BidStream(stream RpcPushRequest)returns( stream RpcPushResponse){}
 
 }
 
