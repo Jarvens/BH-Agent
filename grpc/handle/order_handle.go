@@ -28,7 +28,7 @@ func OrderHandler(request *grpc.RpcPushRequest, context context.Context) error {
 	symbol := event[4]
 	subTypes := event[5]
 	if eventType == common.Subscribe {
-		subscribe(module, symbol, subTypes, userId)
+		subscribe(module, symbol, subTypes, userId, context)
 	} else if eventType == common.UnbSubscribe {
 		unSubscribe(module, symbol, subTypes, userId)
 	}
@@ -40,7 +40,8 @@ func OrderHandler(request *grpc.RpcPushRequest, context context.Context) error {
 // @param symbol 交易对 btc_usdt all
 // @param subType 订阅类型 增量  全量
 // @param userId  用户id
-func subscribe(module, symbol, subType, userId string) {
+func subscribe(module, symbol, subType, userId string, context context.Context) {
+
 	if module == "base" {
 
 	} else if module == "leverage" {

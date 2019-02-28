@@ -6,6 +6,6 @@ import (
 	"github.com/Jarvens/BH-Agent/grpc"
 )
 
-func HeartBeatHandle( request *grpc.RpcPushRequest,context context.Context) error {
+func HeartBeatHandle(request *grpc.RpcPushRequest, context context.Context) error {
 	return nil
 }

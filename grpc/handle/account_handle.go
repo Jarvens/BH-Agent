@@ -11,6 +11,6 @@ import (
 // @param request 请求参数
 // @param context 请求上下文
 // @return error
-func AccountHandle(request *grpc.RpcPushRequest,context context.Context)error  {
-return nil
+func AccountHandle(request *grpc.RpcPushRequest, context context.Context) error {
+	return nil
 }
