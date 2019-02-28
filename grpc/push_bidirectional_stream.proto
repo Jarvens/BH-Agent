@@ -19,3 +19,4 @@ service RpcPushService{
     rpc ChatBidStream(stream RpcPushRequest)returns(RpcPushResponse){}
 
 }
+

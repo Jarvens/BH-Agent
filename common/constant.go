@@ -8,8 +8,14 @@ var Order = "bh.order.%s.%s.%s"
 //bh.chat.order.history
 var Chat = "bh.chat.%s.%s"
 
-//bh.account.btc_usdt.depth
+//账户订阅区分币币、法币...
+//订阅区分全量订阅 与币种订阅
+//订阅区分币种
+//bh.account.symbol.depth.all
+//bh.account.c2c.depth.all
 var Account = "bh.account.%s.%s"
+
+var HeartBeat = "bh.heart.ping"
 
 const (
 	Success = 0
