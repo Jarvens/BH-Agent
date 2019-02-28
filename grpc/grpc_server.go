@@ -2,8 +2,9 @@
 package grpc
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/Jarvens/BH-Agent/common"
+	"github.com/Jarvens/BH-Agent/handle"
 	"io"
 	"strings"
 )
@@ -24,7 +25,7 @@ func (s *server)BidStream(stream RpcPushService_BidStreamServer)error  {
 			//TODO 断连处理器
 			return ctx.Err()
 		default:
-			data, err := stream.Recv()
+			request, err := stream.Recv()
 			if err == io.EOF {
 				fmt.Printf("客户端发送的数据流结束")
 				return nil
@@ -34,29 +35,29 @@ func (s *server)BidStream(stream RpcPushService_BidStreamServer)error  {
 				return err
 			}
 			//bh.order.base.btc_usdt.depth
-			module:=strings.Split(data.Event,".")[1]
+			module:=strings.Split(request.Event,".")[1]
 			switch module {
-			case "结束对话\n":
-				fmt.Printf("收到结束对话指令")
-				if err := stream.Send(&ChatResponse{Output: "收到结束指令"}); err != nil {
-					return err
-				}
-				return nil
-			case "返回数据流\n":
-				fmt.Printf("收到返回数据流指令")
-				for i := 0; i < 10; i++ {
-					if err := stream.Send(&ChatResponse{Output: "服务端返回：" + data.Input}); err != nil {
-						return err
-					}
-				}
-			default:
-				b,_:=json.Marshal(ctx)
-				fmt.Printf("打印上下文信息: %v\n",string(b))
-				fmt.Printf("收到消息：%s\n", data.Input)
-				if err := stream.Send(&ChatResponse{Output: "服务器端返回：" + data.Input}); err != nil {
-					return err
-				}
+			case common.MODULE_ORDER:
+				fmt.Println("start invoke orderHandle")
+				err:=handle.OrderHandler(request,ctx)
+				return err
+			case common.MODULE_CHAT:
+				fmt.Println("start invoke chatHandle")
+				err:=handle.ChatHandle(request,ctx)
+				return err
+			case common.MODULE_ACCOUNT:
+				fmt.Println("start invoke accountHandle")
+				err:=handle.AccountHandle(request,ctx)
+				return err
+			case common.MODULE_HEARTBEAT:
+				fmt.Println("start invoke heartBeatHandle")
+				handle.HeartBeatHandle(request,ctx)
 
+			default:
+				fmt.Println("command not found")
+				if err:=stream.Send(&RpcPushResponse{Code:common.ErrorCommand,Message:common.ErrorMsg(common.ErrorCommand),Data:""});err!=nil{
+					return err
+				}
 			}
 		}
 

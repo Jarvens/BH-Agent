@@ -23,7 +23,10 @@ const (
 )
 
 const (
-	ChatOrder = "order"
+	MODULE_ORDER     = "order"
+	MODULE_ACCOUNT   = "account"
+	MODULE_CHAT      = "chat"
+	MODULE_HEARTBEAT = "ping"
 )
 
 const (
