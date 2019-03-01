@@ -2,10 +2,9 @@
 package handle
 
 import (
-	"context"
 	"github.com/Jarvens/BH-Agent/grpc"
 )
 
-func HeartBeatHandle(request *grpc.RpcPushRequest, context context.Context) error {
+func HeartBeatHandle(request *grpc.RpcPushRequest, stream grpc.RpcPushService_BidStreamServer) error {
 	return nil
 }

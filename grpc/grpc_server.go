@@ -48,19 +48,19 @@ func (s *bidServer) BidStream(stream RpcPushService_BidStreamServer) error {
 			switch module {
 			case common.MODULE_ORDER:
 				fmt.Println("start invoke orderHandle")
-				err := handle.OrderHandler(request, ctx)
+				err := handle.OrderHandler(request, stream)
 				return err
 			case common.MODULE_CHAT:
 				fmt.Println("start invoke chatHandle")
-				err := handle.ChatHandle(request, ctx)
+				err := handle.ChatHandle(request, stream)
 				return err
 			case common.MODULE_ACCOUNT:
 				fmt.Println("start invoke accountHandle")
-				err := handle.AccountHandle(request, ctx)
+				err := handle.AccountHandle(request, stream)
 				return err
 			case common.MODULE_HEARTBEAT:
 				fmt.Println("start invoke heartBeatHandle")
-				handle.HeartBeatHandle(request, ctx)
+				handle.HeartBeatHandle(request, stream)
 			default:
 				fmt.Println("command not found")
 				if err := stream.Send(&RpcPushResponse{Code: common.ErrorCommand, Message: common.ErrorMsg(common.ErrorCommand), Data: ""}); err != nil {

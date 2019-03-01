@@ -2,12 +2,12 @@
 package handle
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"github.com/Jarvens/BH-Agent/common"
 	"github.com/Jarvens/BH-Agent/grpc"
 	"github.com/dgrijalva/jwt-go"
+
 	"strings"
 )
 
@@ -16,7 +16,7 @@ import (
 // @param request 请求参数
 // @param context 请求上下文
 // @return error
-func OrderHandler(request *grpc.RpcPushRequest, context context.Context) error {
+func OrderHandler(request *grpc.RpcPushRequest, stream grpc.RpcPushService_BidStreamServer) error {
 	event := strings.Split(request.Event, ".")
 	dataMap := make(map[string]string)
 	json.Unmarshal([]byte(request.Data), &dataMap)
@@ -25,19 +25,20 @@ func OrderHandler(request *grpc.RpcPushRequest, context context.Context) error {
 	claims, valid := common.ParseToken(token, common.JWTKey)
 	if valid {
 		tokenUserId := claims.(jwt.MapClaims)["userId"]
-	}
-
-	if "" == userId {
-		return errors.New("参数错误")
+		if tokenUserId != userId {
+			return errors.New("非法操作")
+		}
+	} else {
+		return errors.New("token失效")
 	}
 	eventType := event[2]
 	module := event[3]
 	symbol := event[4]
 	subTypes := event[5]
 	if eventType == common.Subscribe {
-		subscribe(module, symbol, subTypes, userId, context)
+		subscribe(module, symbol, subTypes, userId, stream)
 	} else if eventType == common.UnbSubscribe {
-		unSubscribe(module, symbol, subTypes, userId)
+		unSubscribe(module, symbol, subTypes, userId, stream)
 	}
 	return nil
 }
@@ -47,7 +48,7 @@ func OrderHandler(request *grpc.RpcPushRequest, context context.Context) error {
 // @param symbol 交易对 btc_usdt all
 // @param subType 订阅类型 增量  全量
 // @param userId  用户id
-func subscribe(module, symbol, subType, userId string, context context.Context) {
+func subscribe(module, symbol, subType, userId string, stream grpc.RpcPushService_BidStreamServer) {
 
 	if module == "base" {
 	} else if module == "leverage" {
@@ -61,6 +62,6 @@ func subscribe(module, symbol, subType, userId string, context context.Context) 
 // @param symbol 交易对 btc_usdt all
 // @param unSubType 订阅类型 增量  全量
 // @param userId 用户id
-func unSubscribe(module, symbol, unSubType, userId string) {
+func unSubscribe(module, symbol, unSubType, userId string, stream grpc.RpcPushService_BidStreamServer) {
 
 }
