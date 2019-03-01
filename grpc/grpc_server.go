@@ -13,11 +13,10 @@ import (
 
 // rpc连接管理
 type RpcConnection struct {
-	UserId map[string]struct {
-		clientType string                          //客户端类型
-		Stream     *RpcPushService_BidStreamServer //数据流通道
-	}
+	ChanMap map[string]interface{}
 }
+
+var GlobalConnection = new(RpcConnection)
 
 const (
 	port = ":3000"
@@ -83,4 +82,8 @@ func BidDirectionalServer() {
 	if err := server.Serve(address); err != nil {
 		panic(err)
 	}
+}
+
+func (r *RpcConnection) RpcConnectionAdd() error {
+	return nil
 }
