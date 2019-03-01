@@ -4,37 +4,46 @@ package grpc
 import (
 	"fmt"
 	"github.com/Jarvens/BH-Agent/common"
-	"github.com/Jarvens/BH-Agent/handle"
+	"github.com/Jarvens/BH-Agent/grpc/handle"
+	"google.golang.org/grpc"
 	"io"
+	"net"
 	"strings"
 )
+
+// rpc连接管理
+type RpcConnection struct {
+	UserId map[string]struct {
+		clientType string                          //客户端类型
+		Stream     *RpcPushService_BidStreamServer //数据流通道
+	}
+}
 
 const (
 	port = ":3000"
 )
 
-type server struct {
+type bidServer struct {
 }
 
-func (s *server) BidStream(stream RpcPushService_BidStreamServer) error {
+func (s *bidServer) BidStream(stream RpcPushService_BidStreamServer) error {
 	ctx := stream.Context()
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Printf("收到客户端通过context发出的关闭信号")
+			fmt.Printf("receive client message for broken request")
 			//TODO 断连处理器
 			return ctx.Err()
 		default:
 			request, err := stream.Recv()
 			if err == io.EOF {
-				fmt.Printf("客户端发送的数据流结束")
+				fmt.Printf("client stream over")
 				return nil
 			}
 			if err != nil {
-				fmt.Printf("接收数据错误")
+				fmt.Printf("receive stream error")
 				return err
 			}
-			//bh.order.base.btc_usdt.depth
 			module := strings.Split(request.Event, ".")[1]
 			switch module {
 			case common.MODULE_ORDER:
@@ -60,5 +69,18 @@ func (s *server) BidStream(stream RpcPushService_BidStreamServer) error {
 			}
 		}
 
+	}
+}
+
+// gRPC server start
+func BidDirectionalServer() {
+	server := grpc.NewServer()
+	RegisterRpcPushServiceServer(server, &bidServer{})
+	address, err := net.Listen("tcp", port)
+	if err != nil {
+		panic(err)
+	}
+	if err := server.Serve(address); err != nil {
+		panic(err)
 	}
 }

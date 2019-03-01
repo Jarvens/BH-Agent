@@ -4,6 +4,8 @@ package grpc;
 message RpcPushRequest{
     string event=1;
     string data=2;
+    string clientType=3;
+    string version=4;
 }
 
 //response

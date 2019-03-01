@@ -1,6 +1,7 @@
 module github.com/Jarvens/BH-Agent
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/golang/protobuf v1.3.0
 	github.com/gorilla/websocket v1.4.0
 	github.com/jeanphorn/log4go v0.0.0-20181122074309-7df3c8baac7d

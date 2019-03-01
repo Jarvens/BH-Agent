@@ -17,6 +17,9 @@ var Account = "bh.account.%s.%s"
 
 var HeartBeat = "bh.heart.ping"
 
+var JWTHeader = "alg"
+var JWTKey = "alg"
+
 const (
 	Success = 0
 	Fail    = 1

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/Jarvens/BH-Agent/common"
 	"github.com/Jarvens/BH-Agent/grpc"
+	"github.com/dgrijalva/jwt-go"
 	"strings"
 )
 
@@ -20,6 +21,12 @@ func OrderHandler(request *grpc.RpcPushRequest, context context.Context) error {
 	dataMap := make(map[string]string)
 	json.Unmarshal([]byte(request.Data), &dataMap)
 	userId := dataMap["userId"]
+	token := dataMap["token"]
+	claims, valid := common.ParseToken(token, common.JWTKey)
+	if valid {
+		tokenUserId := claims.(jwt.MapClaims)["userId"]
+	}
+
 	if "" == userId {
 		return errors.New("参数错误")
 	}
@@ -43,7 +50,6 @@ func OrderHandler(request *grpc.RpcPushRequest, context context.Context) error {
 func subscribe(module, symbol, subType, userId string, context context.Context) {
 
 	if module == "base" {
-
 	} else if module == "leverage" {
 
 	}
