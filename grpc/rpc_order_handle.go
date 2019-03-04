@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/Jarvens/BH-Agent/common"
 	"github.com/dgrijalva/jwt-go"
-
 	"strings"
 )
 
