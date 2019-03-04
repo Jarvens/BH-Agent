@@ -23,6 +23,7 @@ func OrderHandler(request *RpcPushRequest, stream RpcPushService_BidStreamServer
 	token := dataMap["token"]
 	if token == "" {
 		fmt.Printf("token参数丢失：%s", request.Data)
+		return "参数错误", common.ErrorParameter
 	}
 	claims, valid := common.ParseToken(token, common.JWTKey)
 	if valid {

@@ -42,8 +42,8 @@ func BidDirectionalClient() {
 			break
 		}
 		if err != nil {
-			fmt.Println("接收数据出错")
+			fmt.Printf("接收数据出错: %v\n", err)
 		}
-		fmt.Println("客户端收到数据: ", res)
+		fmt.Printf("客户端收到数据: message: %s code: %d\n", string(res.Message), res.Code)
 	}
 }
