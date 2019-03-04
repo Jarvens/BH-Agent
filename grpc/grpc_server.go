@@ -4,7 +4,6 @@ package grpc
 import (
 	"fmt"
 	"github.com/Jarvens/BH-Agent/common"
-	"github.com/Jarvens/BH-Agent/grpc/handle"
 	"google.golang.org/grpc"
 	"io"
 	"net"
@@ -47,19 +46,19 @@ func (s *bidServer) BidStream(stream RpcPushService_BidStreamServer) error {
 			switch module {
 			case common.MODULE_ORDER:
 				fmt.Println("start invoke orderHandle")
-				err := handle.OrderHandler(request, stream)
+				err := OrderHandler(request, stream)
 				return err
 			case common.MODULE_CHAT:
 				fmt.Println("start invoke chatHandle")
-				err := handle.ChatHandle(request, stream)
+				err := ChatHandle(request, stream)
 				return err
 			case common.MODULE_ACCOUNT:
 				fmt.Println("start invoke accountHandle")
-				err := handle.AccountHandle(request, stream)
+				err := AccountHandle(request, stream)
 				return err
 			case common.MODULE_HEARTBEAT:
 				fmt.Println("start invoke heartBeatHandle")
-				handle.HeartBeatHandle(request, stream)
+				HeartBeatHandle(request, stream)
 			default:
 				fmt.Println("command not found")
 				if err := stream.Send(&RpcPushResponse{Code: common.ErrorCommand, Message: common.ErrorMsg(common.ErrorCommand), Data: ""}); err != nil {

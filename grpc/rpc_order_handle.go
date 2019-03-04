@@ -1,12 +1,11 @@
 // date: 2019-02-28
-package handle
+package grpc
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/Jarvens/BH-Agent/common"
-	"github.com/Jarvens/BH-Agent/grpc"
 	"github.com/dgrijalva/jwt-go"
 
 	"strings"
@@ -17,7 +16,7 @@ import (
 // @param request 请求参数
 // @param context 请求上下文
 // @return error
-func OrderHandler(request *grpc.RpcPushRequest, stream grpc.RpcPushService_BidStreamServer) error {
+func OrderHandler(request *RpcPushRequest, stream RpcPushService_BidStreamServer) error {
 	event := strings.Split(request.Event, ".")
 	dataMap := make(map[string]string)
 	json.Unmarshal([]byte(request.Data), &dataMap)
@@ -37,7 +36,7 @@ func OrderHandler(request *grpc.RpcPushRequest, stream grpc.RpcPushService_BidSt
 	symbol := event[4]
 	subTypes := event[5]
 	if eventType == common.Subscribe {
-		subscribe(module, symbol, subTypes, userId, stream)
+		subscribe(request.Event, module, symbol, subTypes, userId, stream)
 	} else if eventType == common.UnbSubscribe {
 		unSubscribe(module, symbol, subTypes, userId, stream)
 	}
@@ -49,15 +48,15 @@ func OrderHandler(request *grpc.RpcPushRequest, stream grpc.RpcPushService_BidSt
 // @param symbol 交易对 btc_usdt all
 // @param subType 订阅类型 增量  全量
 // @param userId  用户id
-func subscribe(evt, module, symbol, subType, userId string, stream grpc.RpcPushService_BidStreamServer) {
+func subscribe(evt, module, symbol, subType, userId string, stream RpcPushService_BidStreamServer) {
 
 	if module == "base" {
 	} else if module == "leverage" {
 	}
-	valid, _ := common.Contain(userId, grpc.GlobalConnection)
+	valid, _ := common.Contain(userId, GlobalConnection)
 	//存在连接
 	if valid {
-		userMap := grpc.GlobalConnection.ChanMap["web"]
+		userMap := GlobalConnection.ChanMap["web"]
 		connMap := userMap.(map[interface{}]interface{})
 		conn := connMap[stream]
 		event := conn.(map[string][]string)
@@ -85,7 +84,7 @@ func subscribe(evt, module, symbol, subType, userId string, stream grpc.RpcPushS
 
 		userMap := make(map[string]interface{})
 		userMap[userId] = chanType
-		grpc.GlobalConnection.ChanMap = userMap
+		GlobalConnection.ChanMap = userMap
 
 		fmt.Printf("订阅成功")
 	}
@@ -96,6 +95,6 @@ func subscribe(evt, module, symbol, subType, userId string, stream grpc.RpcPushS
 // @param symbol 交易对 btc_usdt all
 // @param unSubType 订阅类型 增量  全量
 // @param userId 用户id
-func unSubscribe(module, symbol, unSubType, userId string, stream grpc.RpcPushService_BidStreamServer) {
+func unSubscribe(module, symbol, unSubType, userId string, stream RpcPushService_BidStreamServer) {
 
 }
