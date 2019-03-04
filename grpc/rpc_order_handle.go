@@ -3,7 +3,6 @@ package grpc
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/Jarvens/BH-Agent/common"
 	"github.com/dgrijalva/jwt-go"
@@ -16,20 +15,23 @@ import (
 // @param request 请求参数
 // @param context 请求上下文
 // @return error
-func OrderHandler(request *RpcPushRequest, stream RpcPushService_BidStreamServer) error {
+func OrderHandler(request *RpcPushRequest, stream RpcPushService_BidStreamServer) (message string, code int) {
 	event := strings.Split(request.Event, ".")
 	dataMap := make(map[string]string)
 	json.Unmarshal([]byte(request.Data), &dataMap)
 	userId := dataMap["userId"]
 	token := dataMap["token"]
+	if token == "" {
+		fmt.Printf("token参数丢失：%s", request.Data)
+	}
 	claims, valid := common.ParseToken(token, common.JWTKey)
 	if valid {
 		tokenUserId := claims.(jwt.MapClaims)["userId"]
 		if tokenUserId != userId {
-			return errors.New("非法操作")
+			return "非法操作", common.ErrorIllegal
 		}
 	} else {
-		return errors.New("token失效")
+		return "token失效", common.ErrorToken
 	}
 	eventType := event[2]
 	module := event[3]
@@ -40,7 +42,7 @@ func OrderHandler(request *RpcPushRequest, stream RpcPushService_BidStreamServer
 	} else if eventType == common.UnbSubscribe {
 		unSubscribe(module, symbol, subTypes, userId, stream)
 	}
-	return nil
+	return "", common.Success
 }
 
 // 订阅

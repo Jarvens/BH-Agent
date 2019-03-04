@@ -40,38 +40,15 @@ const (
 )
 
 const (
-	ErrorProtocol    = 9001
-	ErrorParameter   = 9002
-	ErrorDataFalsify = 9003
-	ErrorSign        = 9004
-	ErrorCommand     = 9005
-	ErrorHeader      = 9006
-	ErrorData        = 9007
-	ErrorVersion     = 9008
-	ErrorAuth        = 9009
+	ErrorProtocol    = 9001 //协议错误
+	ErrorParameter   = 9002 //参数错误
+	ErrorDataFalsify = 9003 //数据被篡改
+	ErrorSign        = 9004 //签名错误
+	ErrorCommand     = 9005 //指令错误
+	ErrorHeader      = 9006 //协议头错误
+	ErrorData        = 9007 //数据错误
+	ErrorVersion     = 9008 //版本错误
+	ErrorAuth        = 9009 //认证错误
+	ErrorIllegal     = 9010 //非法操作
+	ErrorToken       = 9011 //token失效
 )
-
-func ErrorMsg(code int) string {
-	switch code {
-	case ErrorProtocol:
-		return "协议错误"
-	case ErrorParameter:
-		return "参数错误"
-	case ErrorDataFalsify:
-		return "数据被篡改"
-	case ErrorSign:
-		return "签名错误"
-	case ErrorCommand:
-		return "指令不存在"
-	case ErrorHeader:
-		return "协议头错误"
-	case ErrorData:
-		return "数据错误"
-	case ErrorVersion:
-		return "协议版本错误"
-	case ErrorAuth:
-		return "认证错误"
-	default:
-		return "UNKNOWN"
-	}
-}
