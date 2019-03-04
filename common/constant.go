@@ -51,4 +51,5 @@ const (
 	ErrorAuth        = 9009 //认证错误
 	ErrorIllegal     = 9010 //非法操作
 	ErrorToken       = 9011 //token失效
+	ErrorSubRepeat   = 9012 //重复订阅
 )

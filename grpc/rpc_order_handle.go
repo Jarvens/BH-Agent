@@ -3,13 +3,11 @@ package grpc
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/Jarvens/BH-Agent/common"
-	"github.com/dgrijalva/jwt-go"
 	"strings"
 )
 
-//bh.order.subscribe.base.btc_usdt.depth
+// bh.order.subscribe.base.btc_usdt.web
 // 订单处理器
 // @param request 请求参数
 // @param context 请求上下文
@@ -19,58 +17,69 @@ func OrderHandler(request *RpcPushRequest, stream RpcPushService_BidStreamServer
 	dataMap := make(map[string]string)
 	json.Unmarshal([]byte(request.Data), &dataMap)
 	userId := dataMap["userId"]
-	token := dataMap["token"]
-	if token == "" {
-		fmt.Printf("token参数丢失：%s", request.Data)
-		return "参数错误", common.ErrorParameter
-	}
-	claims, valid := common.ParseToken(token, common.JWTKey)
-	if valid {
-		tokenUserId := claims.(jwt.MapClaims)["userId"]
-		if tokenUserId != userId {
-			return "非法操作", common.ErrorIllegal
-		}
-	} else {
-		return "token失效", common.ErrorToken
-	}
+	//token := dataMap["token"]
+	//if token == "" {
+	//	fmt.Printf("token参数丢失：%s", request.Data)
+	//	return "参数错误", common.ErrorParameter
+	//}
+	//claims, valid := common.ParseToken(token, common.JWTKey)
+	//if valid {
+	//	tokenUserId := claims.(jwt.MapClaims)["userId"]
+	//	if tokenUserId != userId {
+	//		return "非法操作", common.ErrorIllegal
+	//	}
+	//} else {
+	//	return "token失效", common.ErrorToken
+	//}
+
+	// module 模块 order account chat
+	// eventType 事件类型  subscribe ub_subscribe
+	// moduleType 模块类型 base leverage
+	// symbol 交易对  all ... btc_usdt
+	// clientType 客户端类型  web  pc
+	module := event[1]
 	eventType := event[2]
-	module := event[3]
+	moduleType := event[3]
 	symbol := event[4]
-	subTypes := event[5]
+	clientType := event[5]
 	if eventType == common.Subscribe {
-		subscribe(request.Event, module, symbol, subTypes, userId, stream)
+		subscribe(request.Event, module, moduleType, symbol, clientType, userId, stream)
 	} else if eventType == common.UnbSubscribe {
-		unSubscribe(module, symbol, subTypes, userId, stream)
+		//unSubscribe(module, symbol, subTypes, userId, stream)
 	}
 	return "", common.Success
 }
 
 // 订阅
-// @param module 模块 币币、杠杆
-// @param symbol 交易对 btc_usdt all
-// @param subType 订阅类型 增量  全量
-// @param userId  用户id
-func subscribe(evt, module, symbol, subType, userId string, stream RpcPushService_BidStreamServer) {
+// module 模块 order account chat
+// eventType 事件类型  subscribe ub_subscribe
+// moduleType 模块类型 base leverage
+// symbol 交易对  all ... btc_usdt
+// clientType 客户端类型  web  pc
+func subscribe(evt, module, moduleType, symbol, clientType,
+	userId string, stream RpcPushService_BidStreamServer) (message string, code int32) {
 
-	if module == "base" {
-	} else if module == "leverage" {
+	if moduleType == "base" {
+	} else if moduleType == "leverage" {
 	}
 	valid, _ := common.Contain(userId, GlobalConnection)
 	//存在连接
 	if valid {
-		userMap := GlobalConnection.ChanMap["web"]
-		connMap := userMap.(map[interface{}]interface{})
-		conn := connMap[stream]
-		event := conn.(map[string][]string)
-		value := event[common.MODULE_ORDER]
+		userMap := GlobalConnection[userId]
+		chanMap := userMap.(map[string]interface{})
+		connMap := chanMap[clientType]
+		moduleMap := connMap.(map[interface{}]interface{})
+		eventMap := moduleMap[stream]
+		event := eventMap.(map[string]interface{})
+		value := event[module]
+		val := value.([]string)
 		//判断订阅信息是否存在 避免重复订阅
 		valid, _ := common.Contain(evt, value)
 		if valid {
-			fmt.Printf("重复订阅: %s", evt)
-			return
+			return "重复订阅", common.ErrorSubRepeat
 		} else {
-			value = append(value, evt)
-			fmt.Printf("订阅成功")
+			val = append(val, evt)
+			return "订阅成功", common.Success
 		}
 
 	} else {
@@ -86,10 +95,10 @@ func subscribe(evt, module, symbol, subType, userId string, stream RpcPushServic
 
 		userMap := make(map[string]interface{})
 		userMap[userId] = chanType
-		GlobalConnection.ChanMap = userMap
-
-		fmt.Printf("订阅成功")
+		GlobalConnection = userMap
+		return "订阅成功", common.Success
 	}
+	return "订阅失败", common.Success
 }
 
 // 取消订阅

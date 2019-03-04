@@ -11,12 +11,7 @@ import (
 	"strings"
 )
 
-// rpc连接管理
-type RpcConnection struct {
-	ChanMap map[string]interface{}
-}
-
-var GlobalConnection = new(RpcConnection)
+var GlobalConnection = make(map[string]interface{})
 
 const (
 	port = ":3000"
@@ -82,10 +77,6 @@ func BidDirectionalServer() {
 	if err := server.Serve(address); err != nil {
 		panic(err)
 	}
-}
-
-func (r *RpcConnection) RpcConnectionAdd() error {
-	return nil
 }
 
 func streamSend(stream RpcPushService_BidStreamServer, message string, code int32) {
