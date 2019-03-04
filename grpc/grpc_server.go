@@ -57,8 +57,8 @@ func (s *bidServer) BidStream(stream RpcPushService_BidStreamServer) error {
 				case common.MODULE_HEARTBEAT:
 					HeartBeatHandle(request, stream)
 				default:
-					fmt.Println("command not found")
-					streamSend(stream, "未知错误", int32(constant.Unknown))
+					fmt.Printf("指令不存在: %v\n", module)
+					streamSend(stream, "指令不存在", int32(constant.Unknown))
 				}
 			}
 		}

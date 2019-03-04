@@ -16,7 +16,6 @@ var Chat = "bh.chat.%s.%s"
 var Account = "bh.account.%s.%s"
 
 var HeartBeat = "bh.heart.ping"
-
 var JWTHeader = "alg"
 var JWTKey = "alg"
 

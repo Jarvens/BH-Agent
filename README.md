@@ -22,3 +22,13 @@
 - 不需要手动编解码
 - 双向数据流
 - pb序列化性能更高
+
+
+## Order
+
+> bh.order.subscribe.base.btc_usdt.web.ws
+
+- bh 固定参数
+- order 订单模块
+- subscribe 订阅
+- base 币币模块

@@ -12,8 +12,11 @@ import (
 // @param request 请求参数
 // @param context 请求上下文
 // @return error
-func OrderHandler(request *RpcPushRequest, stream RpcPushService_BidStreamServer) (message string, code int) {
+func OrderHandler(request *RpcPushRequest, stream RpcPushService_BidStreamServer) (message string, code int32) {
 	event := strings.Split(request.Event, ".")
+	if len(event) < 6 {
+		return "指令错误", common.ErrorCommand
+	}
 	dataMap := make(map[string]string)
 	json.Unmarshal([]byte(request.Data), &dataMap)
 	userId := dataMap["userId"]
@@ -32,38 +35,29 @@ func OrderHandler(request *RpcPushRequest, stream RpcPushService_BidStreamServer
 	//	return "token失效", common.ErrorToken
 	//}
 
-	// module 模块 order account chat
-	// eventType 事件类型  subscribe ub_subscribe
-	// moduleType 模块类型 base leverage
-	// symbol 交易对  all ... btc_usdt
-	// clientType 客户端类型  web  pc
 	module := event[1]
 	eventType := event[2]
 	moduleType := event[3]
-	symbol := event[4]
 	clientType := event[5]
 	if eventType == common.Subscribe {
-		subscribe(request.Event, module, moduleType, symbol, clientType, userId, stream)
+		message, code = subscribe(request.Event, module, moduleType, clientType, userId, stream)
 	} else if eventType == common.UnbSubscribe {
 		//unSubscribe(module, symbol, subTypes, userId, stream)
 	}
-	return "", common.Success
+	return message, code
 }
 
 // 订阅
-// module 模块 order account chat
-// eventType 事件类型  subscribe ub_subscribe
-// moduleType 模块类型 base leverage
-// symbol 交易对  all ... btc_usdt
-// clientType 客户端类型  web  pc
-func subscribe(evt, module, moduleType, symbol, clientType,
+func subscribe(evt, module, moduleType, clientType,
 	userId string, stream RpcPushService_BidStreamServer) (message string, code int32) {
 
 	if moduleType == "base" {
+		//TODO 拉取常规订单数据
 	} else if moduleType == "leverage" {
+		//TODO 拉取杠杆订单数据
 	}
 	valid, _ := common.Contain(userId, GlobalConnection)
-	//存在连接
+
 	if valid {
 		userMap := GlobalConnection[userId]
 		chanMap := userMap.(map[string]interface{})
@@ -73,7 +67,7 @@ func subscribe(evt, module, moduleType, symbol, clientType,
 		event := eventMap.(map[string]interface{})
 		value := event[module]
 		val := value.([]string)
-		//判断订阅信息是否存在 避免重复订阅
+
 		valid, _ := common.Contain(evt, value)
 		if valid {
 			return "重复订阅", common.ErrorSubRepeat
