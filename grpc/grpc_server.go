@@ -31,11 +31,11 @@ func (s *bidServer) BidStream(stream RpcPushService_BidStreamServer) error {
 		default:
 			request, err := stream.Recv()
 			if err == io.EOF {
-				fmt.Printf("client stream over")
+				fmt.Println("关闭客户端")
 				return nil
 			}
 			if err != nil {
-				fmt.Printf("receive stream error")
+				fmt.Printf("接收数据流错误: %v\n", err)
 				return err
 			}
 
@@ -66,8 +66,11 @@ func (s *bidServer) BidStream(stream RpcPushService_BidStreamServer) error {
 	}
 }
 
-// gRPC server start
+//启动gRPC服务
 func BidDirectionalServer() {
+	//1.实例化gRPC
+	//2.注册服务
+	//3.监听端口
 	server := grpc.NewServer()
 	RegisterRpcPushServiceServer(server, &bidServer{})
 	address, err := net.Listen("tcp", port)
@@ -79,6 +82,7 @@ func BidDirectionalServer() {
 	}
 }
 
+//发送流数据
 func streamSend(stream RpcPushService_BidStreamServer, message string, code int32) {
 	err := stream.Send(&RpcPushResponse{Message: message, Code: code})
 	if err != nil {

@@ -3,7 +3,9 @@ package grpc
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/Jarvens/BH-Agent/common"
+	"github.com/dgrijalva/jwt-go"
 	"strings"
 )
 
@@ -20,20 +22,20 @@ func OrderHandler(request *RpcPushRequest, stream RpcPushService_BidStreamServer
 	dataMap := make(map[string]string)
 	json.Unmarshal([]byte(request.Data), &dataMap)
 	userId := dataMap["userId"]
-	//token := dataMap["token"]
-	//if token == "" {
-	//	fmt.Printf("token参数丢失：%s", request.Data)
-	//	return "参数错误", common.ErrorParameter
-	//}
-	//claims, valid := common.ParseToken(token, common.JWTKey)
-	//if valid {
-	//	tokenUserId := claims.(jwt.MapClaims)["userId"]
-	//	if tokenUserId != userId {
-	//		return "非法操作", common.ErrorIllegal
-	//	}
-	//} else {
-	//	return "token失效", common.ErrorToken
-	//}
+	token := dataMap["token"]
+	if token == "" {
+		fmt.Printf("token参数丢失：%s", request.Data)
+		return "参数错误", common.ErrorParameter
+	}
+	claims, valid := common.ParseToken(token, common.JWTKey)
+	if valid {
+		tokenUserId := claims.(jwt.MapClaims)["userId"]
+		if tokenUserId != userId {
+			return "非法操作", common.ErrorIllegal
+		}
+	} else {
+		return "token失效", common.ErrorToken
+	}
 
 	module := event[1]
 	eventType := event[2]
@@ -85,7 +87,7 @@ func subscribe(evt, module, moduleType, clientType,
 		connMap[stream] = moduleMap
 
 		chanType := make(map[string]interface{})
-		chanType["web"] = connMap
+		chanType["app"] = connMap
 
 		userMap := make(map[string]interface{})
 		userMap[userId] = chanType
